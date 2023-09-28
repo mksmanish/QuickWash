@@ -6,55 +6,59 @@ import {
   Text,
   TextInput,
   View,
+  TouchableOpacity,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {location, search} from '../assets';
 import firestore from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
+let i = 0;
 
 const HomeSceen = () => {
+  const [locate, setLocate] = useState('');
+  const [list, setList] = useState('');
   useEffect(() => {
-    datafro();
+    getdata();
   }, []);
 
-  const datafro = async () => {
+  // const datafro = async () => {
+  //   try {
+  //     const usersCollection = await firestore()
+  //       .collection('testing')
+  //       .doc('OWZQZY7sHESK8LB7rlGI')
+  //       .get();
+  //     console.log(usersCollection._data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const getdata = async () => {
     try {
-      const usersCollection = await firestore()
-        .collection('testing')
-        .doc('OWZQZY7sHESK8LB7rlGI')
-        .get();
-      console.log(usersCollection._data);
+      const data = await database().ref('todo').once('value');
+      console.log(data);
+      setList(data.val());
     } catch (error) {
       console.log(error);
     }
   };
 
-  const [locate, setLocate] = useState('');
+  const onPressOfSubmit = async () => {
+    console.log('pressed');
+    try {
+      const response = await database().ref(`todo/${i}`).set({
+        value: locate,
+      });
+      console.log(response);
+      i++;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <SafeAreaView>
-      <View
-        style={{
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          margin: 10,
-        }}>
-        <View style={{marginTop: 10, flexDirection: 'row'}}>
-          <Image style={{height: 25, width: 25}} source={location}></Image>
-          <Text style={{fontWeight: '500', fontSize: 16, textAlign: 'center'}}>
-            B,B6 Drigpal Vihar,Prayagraj ,211016
-          </Text>
-        </View>
-        <Pressable>
-          <Image
-            style={{
-              height: 40,
-              width: 40,
-              borderRadius: 20,
-              backgroundColor: 'black',
-            }}
-            source={location}></Image>
-        </Pressable>
-      </View>
-      <View>
+      <View style={{marginTop: 10}}>
         <View
           style={{
             borderWidth: 1,
@@ -67,21 +71,27 @@ const HomeSceen = () => {
             alignSelf: 'center',
           }}>
           <TextInput
-            placeholder="Search Location"
+            placeholder="Enter Text"
             placeholderTextColor={'gray'}
+            value={locate}
             onChangeText={text => setLocate(text)}
             style={{marginLeft: 10}}></TextInput>
-
-          <Image
-            source={search}
-            style={{
-              height: 25,
-              width: 25,
-              tintColor: 'red',
-              alignSelf: 'center',
-              marginRight: 10,
-            }}></Image>
         </View>
+        <TouchableOpacity
+          onPress={() => onPressOfSubmit()}
+          style={{
+            padding: 15,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'red',
+            width: '90%',
+            marginVertical: 10,
+            marginRight: 'auto',
+            marginLeft: 'auto',
+            borderRadius: 8,
+          }}>
+          <Text>Submit</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
