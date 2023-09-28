@@ -7,10 +7,27 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {location, search} from '../assets';
+import firestore from '@react-native-firebase/firestore';
 
 const HomeSceen = () => {
+  useEffect(() => {
+    datafro();
+  }, []);
+
+  const datafro = async () => {
+    try {
+      const usersCollection = await firestore()
+        .collection('testing')
+        .doc('OWZQZY7sHESK8LB7rlGI')
+        .get();
+      console.log(usersCollection._data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const [locate, setLocate] = useState('');
   return (
     <SafeAreaView>
