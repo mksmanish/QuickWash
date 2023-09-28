@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {location, search} from '../assets';
@@ -35,9 +36,15 @@ const HomeSceen = () => {
 
   const getdata = async () => {
     try {
-      const data = await database().ref('todo').once('value');
-      console.log(data);
-      setList(data.val());
+      // for single use
+      // const data = await database().ref('todo').once('value');
+      // console.log(data);
+      // setList(data.val());
+      const data = await database()
+        .ref('todo')
+        .on('value', tempData => {
+          setList(tempData.val());
+        });
     } catch (error) {
       console.log(error);
     }
@@ -46,7 +53,8 @@ const HomeSceen = () => {
   const onPressOfSubmit = async () => {
     console.log('pressed');
     try {
-      const response = await database().ref(`todo/${i}`).set({
+      const index = list.length;
+      const response = await database().ref(`todo/${index}`).set({
         value: locate,
       });
       console.log(response);
@@ -92,6 +100,9 @@ const HomeSceen = () => {
           }}>
           <Text>Submit</Text>
         </TouchableOpacity>
+        <FlatList
+          data={list}
+          renderItem={({item}) => <Text>{item?.value}</Text>}></FlatList>
       </View>
     </SafeAreaView>
   );
