@@ -8,6 +8,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {location, search} from '../assets';
@@ -58,6 +59,7 @@ const HomeSceen = () => {
       const response = await database().ref(`todo/${index}`).set({
         value: locate,
       });
+      setLocate('');
       console.log(response);
     } catch (error) {
       console.log(error);
@@ -69,7 +71,9 @@ const HomeSceen = () => {
       const response = await database().ref(`todo/${selectedIndex}`).update({
         value: locate,
       });
+      setLocate('');
       console.log(response);
+      setIsUpdate(false);
     } catch (error) {
       console.log(error);
     }
@@ -83,6 +87,31 @@ const HomeSceen = () => {
       setIsUpdate(true);
     } catch (error) {}
   };
+
+  const onPressCardItem = async index => {
+    console.log(index);
+    Alert.alert('delete', 'You want to delete?', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          try {
+            const response = await database().ref(`todo/${index}`).remove();
+            setLocate('');
+            setIsUpdate(false);
+            console.log(response);
+          } catch (error) {
+            console.log(error);
+          }
+        },
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView>
       <View style={{marginTop: 10}}>
@@ -142,7 +171,8 @@ const HomeSceen = () => {
           data={list}
           renderItem={({item, index}) => (
             <TouchableOpacity
-              onPress={() => handleCardPress(index, item?.value)}>
+              onPress={() => handleCardPress(index, item?.value)}
+              onLongPress={() => onPressCardItem(index, item?.value)}>
               <Text>{item?.value}</Text>
             </TouchableOpacity>
           )}></FlatList>
