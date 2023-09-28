@@ -13,11 +13,12 @@ import React, {useState, useEffect} from 'react';
 import {location, search} from '../assets';
 import firestore from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
-let i = 0;
 
 const HomeSceen = () => {
   const [locate, setLocate] = useState('');
   const [list, setList] = useState('');
+  const [isupdate, setIsUpdate] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(null);
   useEffect(() => {
     getdata();
   }, []);
@@ -58,12 +59,30 @@ const HomeSceen = () => {
         value: locate,
       });
       console.log(response);
-      i++;
     } catch (error) {
       console.log(error);
     }
   };
 
+  const onPressOfUpdate = async () => {
+    try {
+      const response = await database().ref(`todo/${selectedIndex}`).update({
+        value: locate,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCardPress = (index, value) => {
+    try {
+      console.log(index);
+      setSelectedIndex(index);
+      setLocate(value);
+      setIsUpdate(true);
+    } catch (error) {}
+  };
   return (
     <SafeAreaView>
       <View style={{marginTop: 10}}>
@@ -85,24 +104,48 @@ const HomeSceen = () => {
             onChangeText={text => setLocate(text)}
             style={{marginLeft: 10}}></TextInput>
         </View>
-        <TouchableOpacity
-          onPress={() => onPressOfSubmit()}
-          style={{
-            padding: 15,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'red',
-            width: '90%',
-            marginVertical: 10,
-            marginRight: 'auto',
-            marginLeft: 'auto',
-            borderRadius: 8,
-          }}>
-          <Text>Submit</Text>
-        </TouchableOpacity>
+        {!isupdate ? (
+          <TouchableOpacity
+            onPress={() => onPressOfSubmit()}
+            style={{
+              padding: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'red',
+              width: '90%',
+              marginVertical: 10,
+              marginRight: 'auto',
+              marginLeft: 'auto',
+              borderRadius: 8,
+            }}>
+            <Text>Submit</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => onPressOfUpdate()}
+            style={{
+              padding: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'red',
+              width: '90%',
+              marginVertical: 10,
+              marginRight: 'auto',
+              marginLeft: 'auto',
+              borderRadius: 8,
+            }}>
+            <Text>Update</Text>
+          </TouchableOpacity>
+        )}
+
         <FlatList
           data={list}
-          renderItem={({item}) => <Text>{item?.value}</Text>}></FlatList>
+          renderItem={({item, index}) => (
+            <TouchableOpacity
+              onPress={() => handleCardPress(index, item?.value)}>
+              <Text>{item?.value}</Text>
+            </TouchableOpacity>
+          )}></FlatList>
       </View>
     </SafeAreaView>
   );
