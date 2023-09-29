@@ -5,6 +5,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import auth from '@react-native-firebase/auth';
@@ -15,13 +16,14 @@ const SignUp = () => {
   const [password, setPassword] = useState();
   const navigation = useNavigation();
 
-  const onPressOfSubmit = () => {
+  const onPressOfSubmit = async () => {
     try {
       if (email.length > 0 && password.length > 0) {
         auth()
           .createUserWithEmailAndPassword(email, password)
           .then(() => {
             console.log('User account created & signed in!');
+
             navigation.navigate('Sign');
           })
           .catch(error => {
@@ -36,6 +38,9 @@ const SignUp = () => {
             console.error(error);
           });
       }
+      Alert.alert('please verify the verification link');
+      await auth().currentUser.sendEmailVerification();
+      await auth().signOut();
     } catch (error) {}
   };
 
