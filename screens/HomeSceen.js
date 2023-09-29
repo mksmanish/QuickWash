@@ -14,12 +14,14 @@ import React, {useState, useEffect} from 'react';
 import {location, search} from '../assets';
 import firestore from '@react-native-firebase/firestore';
 import database from '@react-native-firebase/database';
+import {useNavigation} from '@react-navigation/native';
 
 const HomeSceen = () => {
   const [locate, setLocate] = useState('');
   const [list, setList] = useState('');
   const [isupdate, setIsUpdate] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const navigation = useNavigation();
   useEffect(() => {
     getdata();
   }, []);
@@ -52,18 +54,18 @@ const HomeSceen = () => {
     }
   };
 
-  const onPressOfSubmit = async () => {
-    console.log('pressed');
-    try {
-      const index = list.length;
-      const response = await database().ref(`todo/${index}`).set({
-        value: locate,
-      });
-      setLocate('');
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-    }
+  const onPressOfSubmit = () => {
+    navigation.navigate('Login');
+    // try {
+    //   const index = list.length;
+    //   const response = await database().ref(`todo/${index}`).set({
+    //     value: locate,
+    //   });
+    //   setLocate('');
+    //   console.log(response);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   const onPressOfUpdate = async () => {
@@ -113,7 +115,7 @@ const HomeSceen = () => {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex: 1}}>
       <View style={{marginTop: 10}}>
         <View
           style={{
